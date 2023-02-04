@@ -18,9 +18,9 @@ contract AccountLinker is ERC2771Context, Ownable {
 
     /**
      * Emitted when an account is linked.
-     * @param player
-     * @param platform
-     * @param uuid
+     * @param player The address of the player
+     * @param platform The platform the player is linking
+     * @param uuid The uuid of the player on the platform
      */
     event AccountLinked(address indexed player, string platform, string uuid);
 
@@ -44,7 +44,7 @@ contract AccountLinker is ERC2771Context, Ownable {
         string memory _platform
     ) public view returns (address) {
         string memory lowercaseUuid = _stringToLower(_uuid);
-        return addressByUUIDByPlatform[lowercaseUuid][platform];
+        return addressByUUIDByPlatform[lowercaseUuid][_platform];
     }
 
     /**
@@ -104,5 +104,27 @@ contract AccountLinker is ERC2771Context, Ownable {
     ) internal view returns (bool) {
         return
             approvedSigner == hash.toEthSignedMessageHash().recover(signature);
+    }
+
+    /**
+     * Overrides
+     */
+
+    function _msgSender()
+        internal
+        view
+        override(Context, ERC2771Context)
+        returns (address)
+    {
+        return super._msgSender();
+    }
+
+    function _msgData()
+        internal
+        view
+        override(Context, ERC2771Context)
+        returns (bytes calldata)
+    {
+        return super._msgData();
     }
 }
