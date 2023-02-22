@@ -12,6 +12,12 @@ contract SimpleClan is IClan {
 
     address public factory;
 
+    event MemberAdded(address indexed member, address indexed addedBy);
+    event MemberRemoved(address indexed member, address indexed removedBy);
+    event Initialized(address indexed leader);
+    event NameChanged(string name, address indexed changedBy);
+    event SymbolChanged(string symbol, address indexed changedBy);
+
     function initialize(
         string memory _name,
         string memory _symbol,
@@ -23,12 +29,14 @@ contract SimpleClan is IClan {
         symbol = _symbol;
         leader = _leader;
         members.push(_leader);
+        emit Initialized(_leader);
     }
 
     function addMember(address _member) external override {
         require(isMember(_member) == false, "Already a member");
         require(msg.sender == leader, "Only the leader can add members");
         members.push(_member);
+        emit MemberAdded(_member, msg.sender);
     }
 
     function removeMember(address _member) external override {
@@ -41,6 +49,7 @@ contract SimpleClan is IClan {
                 break;
             }
         }
+        emit MemberRemoved(_member, msg.sender);
     }
 
     function isMember(address _member) public view override returns (bool) {
@@ -67,6 +76,7 @@ contract SimpleClan is IClan {
     function setName(string memory _name) external override {
         require(msg.sender == leader, "Only the leader can set the name");
         name = _name;
+        emit NameChanged(_name, msg.sender);
     }
 
     function getSymbol() external view override returns (string memory) {
@@ -76,5 +86,6 @@ contract SimpleClan is IClan {
     function setSymbol(string memory _symbol) external override {
         require(msg.sender == leader, "Only the leader can set the symbol");
         symbol = _symbol;
+        emit SymbolChanged(_symbol, msg.sender);
     }
 }

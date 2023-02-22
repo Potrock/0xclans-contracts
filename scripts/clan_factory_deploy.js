@@ -5,7 +5,7 @@ async function main() {
 		"ClanFactoryClones"
 	);
 	const clanFactory = await ClanFactory.deploy(
-		"0xf2665CC4e237568fB524d7d1AfA0Ae140323F1fD"
+		"0xa11d5D6f84fD2B3Cdea1a1F3d2ce45c3CB06628c"
 	);
 
 	await clanFactory.deployed();
