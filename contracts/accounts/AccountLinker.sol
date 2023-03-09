@@ -23,9 +23,10 @@ contract AccountLinker is ERC2771Context, Ownable {
      * @param uuid The uuid of the player on the platform
      */
     event AccountLinked(address indexed player, string platform, string uuid);
+    event AccountUnlinked(address indexed player, string platform, string uuid);
 
     constructor(address _trustedForwarder) ERC2771Context(_trustedForwarder) {
-        approvedSigner = msg.sender;
+        approvedSigner = _msgSender();
     }
 
     /**
@@ -59,7 +60,7 @@ contract AccountLinker is ERC2771Context, Ownable {
         string memory lowercaseUuid = _stringToLower(_uuid);
         require(
             _verifyApprovedSigner(
-                keccak256(abi.encode(msg.sender, lowercaseUuid, _platform)),
+                keccak256(abi.encode(_msgSender(), lowercaseUuid, _platform)),
                 _signature
             ),
             "Invalid signature"
@@ -69,6 +70,14 @@ contract AccountLinker is ERC2771Context, Ownable {
         addressByUUIDByPlatform[lowercaseUuid][_platform] = _msgSender();
 
         emit AccountLinked(_msgSender(), _platform, lowercaseUuid);
+    }
+
+    function unlinkPlayerByPlatform(string calldata _platform) public {
+        string memory uuid = uuidByAddressByPlatform[_msgSender()][_platform];
+        delete uuidByAddressByPlatform[_msgSender()][_platform];
+        delete addressByUUIDByPlatform[uuid][_platform];
+
+        emit AccountUnlinked(_msgSender(), _platform, uuid);
     }
 
     /**
